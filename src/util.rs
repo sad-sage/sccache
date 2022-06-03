@@ -511,7 +511,6 @@ pub trait DateTimeExt {
     fn to_rfc7231(&self) -> String;
 }
 
-#[cfg(feature = "azure")]
 impl<Tz: chrono::TimeZone> DateTimeExt for chrono::DateTime<Tz>
 where
     Tz::Offset: core::fmt::Display,
