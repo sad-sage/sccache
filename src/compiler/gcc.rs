@@ -247,6 +247,7 @@ where
     let mut extra_hash_files = vec![];
     let mut compilation = false;
     let mut multiple_input = false;
+    let mut multiple_input_files: Vec<String> = vec![];
     let mut pedantic_flag = false;
     let mut language_extensions = true; // by default, GCC allows extensions
     let mut split_dwarf = false;
@@ -351,6 +352,7 @@ where
                 Argument::Raw(ref val) => {
                     if input_arg.is_some() {
                         multiple_input = true;
+                        multiple_input_files.push(val.clone().into_string().unwrap())
                     }
                     input_arg = Some(val.clone());
                 }
@@ -469,7 +471,12 @@ where
     }
     // Can't cache compilations with multiple inputs.
     if multiple_input {
-        cannot_cache!("multiple input files");
+        const SEP: &str = ", ";
+        let multiple_input_files_string = multiple_input_files.join(SEP);
+        cannot_cache!(
+            "multiple input files",
+            multiple_input_files_string.to_string()
+        );
     }
     let input = match input_arg {
         Some(i) => i,
@@ -1328,10 +1335,24 @@ mod test {
     }
 
     #[test]
-    fn test_parse_arguments_too_many_inputs() {
+    fn test_parse_arguments_too_many_inputs_single() {
         assert_eq!(
-            CompilerArguments::CannotCache("multiple input files", None),
+            CompilerArguments::CannotCache("multiple input files", Some("bar.c".to_string())),
             parse_arguments_(stringvec!["-c", "foo.c", "-o", "foo.o", "bar.c"], false)
+        );
+    }
+
+    #[test]
+    fn test_parse_arguments_too_many_inputs_multiple() {
+        assert_eq!(
+            CompilerArguments::CannotCache(
+                "multiple input files",
+                Some("bar.c, baz.c".to_string())
+            ),
+            parse_arguments_(
+                stringvec!["-c", "foo.c", "-o", "foo.o", "bar.c", "baz.c"],
+                false
+            )
         );
     }
 

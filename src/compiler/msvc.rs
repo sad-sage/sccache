@@ -513,7 +513,10 @@ pub fn parse_arguments(
                     Argument::Raw(ref val) => {
                         if input_arg.is_some() {
                             // Can't cache compilations with multiple inputs.
-                            cannot_cache!("multiple input files");
+                            cannot_cache!(
+                                "multiple input files",
+                                val.clone().into_string().unwrap()
+                            );
                         }
                         input_arg = Some(val.clone());
                     }
@@ -1334,8 +1337,8 @@ mod test {
     #[test]
     fn test_parse_arguments_too_many_inputs() {
         assert_eq!(
-            CompilerArguments::CannotCache("multiple input files", None),
-            parse_arguments(ovec!["-c", "foo.c", "-Fofoo.obj", "bar.c"])
+            CompilerArguments::CannotCache("multiple input files", Some("bar.c".to_string())),
+            parse_arguments(ovec!["-c", "foo.c", "-Fofoo.obj", "bar.c", "baz.c"])
         );
     }
 
