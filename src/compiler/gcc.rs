@@ -111,6 +111,7 @@ ArgData! { pub
     NoDiagnosticsColorFlag,
     // Should only be necessary for -Xclang flags - unknown flags not hidden behind
     // that are assumed to not affect compilation
+    PassThroughFlag,
     PassThrough(OsString),
     PassThroughPath(PathBuf),
     PreprocessorArgumentFlag,
@@ -328,6 +329,7 @@ where
             | Some(PreprocessorArgumentFlag)
             | Some(PreprocessorArgument(_))
             | Some(PreprocessorArgumentPath(_))
+            | Some(PassThroughFlag)
             | Some(PassThrough(_))
             | Some(PassThroughPath(_)) => {}
             Some(Language(lang)) => {
@@ -372,6 +374,7 @@ where
             | Some(DiagnosticsColorFlag)
             | Some(NoDiagnosticsColorFlag)
             | Some(Arch(_))
+            | Some(PassThroughFlag)
             | Some(PassThrough(_))
             | Some(PassThroughPath(_)) => &mut common_args,
             Some(ExtraHashFile(path)) => {
@@ -434,6 +437,7 @@ where
             | Some(DiagnosticsColorFlag)
             | Some(NoDiagnosticsColorFlag)
             | Some(Arch(_))
+            | Some(PassThroughFlag)
             | Some(PassThrough(_))
             | Some(PassThroughPath(_)) => &mut common_args,
             Some(ExtraHashFile(path)) => {
